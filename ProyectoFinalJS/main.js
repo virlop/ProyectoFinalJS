@@ -97,7 +97,6 @@ dineroDisponible(gastos, ingresos);
 
 
 
-
 // let montoTotal = Number(prompt("Ingrese su monto inicial total de dinero"));
 // let menu = true;
 
