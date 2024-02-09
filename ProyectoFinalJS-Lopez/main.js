@@ -5,6 +5,7 @@ let gastos = [];
 let ingresos = [];
 let registroCompleto = [];
 let usuarios = [];
+let usuarioActual;
 
 //----------------------CLASES------------------------------------------------------
 
@@ -55,9 +56,9 @@ class Ingreso{
     }
 }
 class Usuario{
-    constructor(email, contraseña){
+    constructor(email, contrasena){
         this.email = email;
-        this.contraseña = contraseña;
+        this.contrasena = contrasena;
         this.gastos = [];
         this.ingresos = [];
     }
@@ -76,15 +77,6 @@ function buscarCategoria(nombreCategoria, categorias){
     return miCategoria;
 }
 
-function buscarUsuario(usuarios, email){
-    let usuarioBuscado = null;
-    usuarios.forEach(usuario => {
-        if (usuario.email == email) {
-            usuarioBuscado = usuario;
-        }
-    });
-    return usuarioBuscado;
-}
 
 function iniciarSesión(contenedorFormularios){
 
@@ -112,21 +104,179 @@ function iniciarSesión(contenedorFormularios){
 
     entrarBoton.addEventListener("click", function(){
         let email = inputEmail.value;
-        let contraseña = inputContrasena.value;
-        alert(email);
-        alert(contraseña);
-        buscarUsuario(usuarios, email);
+        let contrasena = inputContrasena.value;
+        let usuarioEncontrado = JSON.parse(localStorage.getItem(email));
+        
+        if (usuarioEncontrado && usuarioEncontrado.contrasena == contrasena) {
+            contenedorFormularios.innerHTML = "";
+            usuarioActual = new Usuario(email,contrasena);
+            usuarios.push(usuarioActual);
+            alert("Inicio de sesión exitoso");
+            alert(usuarioActual.Categoria);
+        
+        } else {
+            alert("Usuario no registrado / email o contraseña incorrectos");
+        }
+
     })
 
 }
 
 function crearUsuario(contenedorFormularios){
+    contenedorFormularios.innerHTML = "";
+    let inputEmailLabel = document.createElement("label");
+    inputEmailLabel.classList.add("form-label", "m-2");
+    inputEmailLabel.innerHTML = "Ingresa tu mail para crear una cuenta nueva";
+    contenedorFormularios.appendChild(inputEmailLabel);
+    let inputEmail = document.createElement("input")
+    inputEmail.classList.add("form-control", "m-2", "formulario");
+    contenedorFormularios.appendChild(inputEmail);
+
+    let inputContrasenaLabel =  document.createElement("label");
+    inputContrasenaLabel.classList.add("form-label", "m-2");
+    inputContrasenaLabel.innerHTML= "Ingresa la contraseña de tu nueva cuenta";
+    contenedorFormularios.appendChild(inputContrasenaLabel);
+
+    let inputContrasena = document.createElement("input")
+    inputContrasena.classList.add("form-control", "m-2", "formulario");
+    contenedorFormularios.appendChild(inputContrasena);
+
+    let crearCuentaBoton = document.createElement("button");
+    crearCuentaBoton.setAttribute("type", "button");
+    crearCuentaBoton.classList.add("btn", "btn-secondary", "m-2");
+    crearCuentaBoton.innerHTML = "Crear cuenta";
+    contenedorFormularios.appendChild(crearCuentaBoton);
+
+    crearCuentaBoton.addEventListener("click", function(){
+        let email = inputEmail.value;
+        let contrasena = inputContrasena.value;
+        if (email && contrasena) {
+            let nuevoUsuario = new Usuario(email,contrasena);
+        localStorage.setItem(email, JSON.stringify(nuevoUsuario));
+        contenedorFormularios = "";
+        alert("Cuenta creada con éxito");
+        
+        } else {
+            alert("Ingrese usuario o contraseña validos");
+        }
+        
+    })
 
 }
 
 function mostrarGastos(contenedorInfo, tituloInfo, contenedorFormularios){
     limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
-    tituloInfo.innerHTML = "Estos son tus gastos";
+    if (usuarioActual) {
+        
+        tituloInfo.innerHTML = "Estos son tus gastos";
+
+        let tablaGastos = document.createElement("table");
+        tablaGastos.classList.add("table");
+        contenedorFormularios.appendChild(tablaGastos);
+        
+        let theadGastos = document.createElement("thead");
+        tablaGastos.appendChild(theadGastos);
+
+        let trGastos = document.createElement("tr");
+        theadGastos.appendChild(trGastos);
+
+        let thGastosMonto = document.createElement("th");
+        thGastosMonto.setAttribute("scope", "col");
+        thGastosMonto.innerHTML = "Monto";
+
+        let thGastosFecha = document.createElement("th");
+        thGastosFecha.setAttribute("scope", "col");
+        thGastosFecha.innerHTML = "Fecha";
+
+        let thGastosCategoria = document.createElement("th");
+        thGastosCategoria.setAttribute("scope", "col");
+        thGastosCategoria.innerHTML = "Categoria";
+
+        let thGastosDescripcion = document.createElement("th");
+        thGastosDescripcion.setAttribute("scope", "col");
+        thGastosDescripcion.innerHTML = "Descripcion";
+
+        trGastos.appendChild(thGastosMonto);
+        trGastos.appendChild(thGastosDescripcion);
+        trGastos.appendChild(thGastosCategoria);
+        trGastos.appendChild(thGastosFecha);
+
+        let thBody = document.createElement("tbody");
+        tablaGastos.appendChild(thBody);
+
+        usuarioActual.gastos.forEach(gasto => {
+        let trGasto = document.createElement("tr");
+        thBody.appendChild(trGasto);
+
+        let thGastosMonto = document.createElement("th");
+        let tdGastosDescripcion =  Document.createElement("td");
+        let tdGastosCategoria =  Document.createElement("td");
+        let tdGastosFecha =  Document.createElement("td");
+
+        thGastosMonto.setAttribute("scope", "row");
+        thGastosMonto.innerHTML = `${gasto.monto}`;
+
+
+
+        
+        });
+        
+    } else {
+        let textoGastos = document.createElement("p");
+        textoGastos.innerHTML = "Debes iniciar sesion";
+        contenedorInfo.appendChild(textoGastos);
+
+    }
+    
+
+
+    //agregar nuevos gastos
+    let inputGastoMontoLabel =  document.createElement("label");
+    inputGastoMontoLabel.classList.add("form-label", "m-2");
+    inputGastoMontoLabel.innerHTML= "Ingrese el monto";
+    contenedorFormularios.appendChild(inputGastoMontoLabel);
+
+    let inputGastoMonto = document.createElement("input")
+    inputGastoMonto.classList.add("form-control", "m-2", "formulario");
+    contenedorFormularios.appendChild(inputGastoMonto);
+
+    let inputGastoCategoriaLabel =  document.createElement("label");
+    inputGastoCategoriaLabel.classList.add("form-label", "m-2");
+    inputGastoCategoriaLabel.innerHTML = "Ingrese la categoria";
+    contenedorFormularios.appendChild(inputGastoCategoriaLabel);
+
+    let inputGastoCategoria = document.createElement("input")
+    inputGastoMonto.classList.add("form-control", "m-2", "formulario");
+    contenedorFormularios.appendChild(inputGastoCategoria);
+
+    let inputGastoDescripLabel =  document.createElement("label");
+    inputGastoDescripLabel.classList.add("form-label", "m-2");
+    inputGastoDescripLabel.innerHTML= "Ingrese la descripcion";
+    contenedorFormularios.appendChild(inputGastoDescripLabel);
+
+    let inputGastoDescrip = document.createElement("input")
+    inputGastoDescrip.classList.add("form-control", "m-2", "formulario");
+    contenedorFormularios.appendChild(inputGastoDescrip);
+
+    let botonAgregarGasto = document.createElement("button");
+    botonAgregarGasto.setAttribute("type", "button");
+    botonAgregarGasto.classList.add("btn", "btn-secondary", "m-2");
+    botonAgregarGasto.innerHTML = "Agregar gasto";
+    contenedorFormularios.appendChild(botonAgregarGasto);
+
+    botonAgregarGasto.addEventListener("click", function(){
+        if(usuarioActual){
+            let gasto =  new Gasto(inputGastoMonto.value, inputGastoCategoria.value, inputGastoDescrip.value);
+            usuarioActual.agregarGasto(gasto);
+            localStorage.setItem(usuarioActual.email,JSON.stringify(usuarioActual));
+            alert("Gasto agregado!");
+            
+        }else{
+            alert("Debe iniciar sesion");
+        }
+        
+    })
+
     
 }
 function mostrarIngresos(contenedorInfo, tituloInfo, contenedorFormularios){
@@ -149,11 +299,15 @@ function limpiar(contenedorInfo, tituloInfo, contenedorFormularios){
     contenedorFormularios.innerHTML = "";
 }
 
+
+
 //----------------------FLUJO------------------------------------------------------
 let contenedorInfo = document.getElementById("contenedorInfo");
 let tituloInfo = document.getElementById("tituloInfo");
 let contenedorFormularios = document.getElementById("contenedorFormularios");
 let formulariosAgregadosInicioSesion = false;
+let formulariosAgregadosUnirse = false;
+
 
 document.getElementById("botonIniciarSesion").addEventListener("click", function(){
     limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
@@ -169,6 +323,7 @@ document.getElementById("botonIniciarSesion").addEventListener("click", function
         if (!formulariosAgregadosInicioSesion) {
             iniciarSesión(contenedorFormularios);
             formulariosAgregadosInicioSesion = true;
+            
         } 
     });
 
@@ -179,26 +334,34 @@ document.getElementById("botonIniciarSesion").addEventListener("click", function
     botonUnirse.innerHTML = "Quiero unirme";
     contenedorInfo.appendChild(botonUnirse);
     botonUnirse.addEventListener("click", function(){
-        crearUsuario(contenedorFormularios);
+        if (!formulariosAgregadosUnirse) {
+            crearUsuario(contenedorFormularios);
+            formulariosAgregadosUnirse = true;
+        } 
     });
 
 })
 document.getElementById("botonGastos").addEventListener("click", function(){
     mostrarGastos(contenedorInfo, tituloInfo, contenedorFormularios);
     formulariosAgregadosInicioSesion = false;
+    formulariosAgregadosUnirse = false;
+
 });
 
 document.getElementById("botonIngresos").addEventListener("click", function(){
     mostrarIngresos(contenedorInfo, tituloInfo, contenedorFormularios)
     formulariosAgregadosInicioSesion = false;
+    formulariosAgregadosUnirse = false;
 });
 
 document.getElementById("botonDatosEstadisticos").addEventListener("click", function(){
     mostrarDatosEstadisticos(contenedorInfo, tituloInfo, contenedorFormularios);
     formulariosAgregadosInicioSesion = false;
+    formulariosAgregadosUnirse = false;
 });
 
 document.getElementById("botonSobreNosotros").addEventListener("click", function(){
     mostrarSobreNosotros(contenedorInfo, tituloInfo, contenedorFormularios);
     formulariosAgregadosInicioSesion = false;
+    formulariosAgregadosUnirse = false;
 });
