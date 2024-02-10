@@ -1,58 +1,41 @@
+
 //----------------------VARIABLES------------------------------------------------------
 
-let categorias = [];
-let gastos = [];
-let ingresos = [];
-let registroCompleto = [];
-let usuarios = [];
 let usuarioActual;
+let contenedorUsuario = document.getElementById("contenedorUsuario");
+let tituloInfo = document.getElementById("tituloInfo");
+let contenedorGastos = document.getElementById("contenedorGastos");
+let contenedorIngresos =  document.getElementById("contenedorIngresos");
+let contenedorDE = document.getElementById("contenedorDE");
+let contenedorSN =  document.getElementById("contenedorSN");
+let contenedorAgregarGasto = document.getElementById("contenedorAgregarGasto");
+let contenedorTablaGastos = document.getElementById("contenedorTablaGastos");
 
 //----------------------CLASES------------------------------------------------------
 
-class Categoria{
-    constructor(nombreCategoria){
-        this.nombreCategoria = nombreCategoria;
-    }
-}
+
 class Gasto{
-    constructor(monto, nombreCategoria, descripcion){
+    constructor(monto, categoria, descripcion){
         if (monto > 0) {
             this.monto = -monto;
         }else{
             this.monto = monto;
         }
         this.fecha = new Date();
-        let categoriaEncontrada = buscarCategoria(nombreCategoria, categorias);
-        if (typeof categoriaEncontrada === 'undefined' ) {
-            let nuevaCategoria = new Categoria(nombreCategoria);
-            this.Categoria = nuevaCategoria;
-            categorias.push(nuevaCategoria); 
-        } else {
-            this.Categoria = categoriaEncontrada;
-        }
+        this.categoria = categoria;
         this.descripcion = descripcion;
-        registroCompleto.push(this);
     }
 }
 
 class Ingreso{
-    constructor(monto, nombreCategoria, descripcion){
+    constructor(monto, categoria, descripcion){
         if (monto < 0) {
             this.monto = -monto;
         }else{
             this.monto = monto;
         }
-        this.fecha = new Date();
-        let categoriaEncontrada = buscarCategoria(nombreCategoria, categorias);
-        if (typeof categoriaEncontrada === 'undefined' ) {
-            let nuevaCategoria = new Categoria(nombreCategoria);
-            this.Categoria = nuevaCategoria;
-            categorias.push(nuevaCategoria); 
-        } else {
-            this.Categoria = categoriaEncontrada;
-        }
+        this.categoria = categoria;
         this.descripcion = descripcion;
-        registroCompleto.push(this);
     }
 }
 class Usuario{
@@ -72,47 +55,48 @@ class Usuario{
 
 //----------------------FUNCIONES------------------------------------------------------
 
-function buscarCategoria(nombreCategoria, categorias){
-    let miCategoria = categorias.find((categoria) => categoria.nombreCategoria == nombreCategoria);
-    return miCategoria;
+function mostrarFecha(fecha){
+    return "Mes: " + (fecha.getMonth() + 1) + ", Día: " + fecha.getDate() + ", Año: " + fecha.getFullYear();
 }
 
-
-function iniciarSesión(contenedorFormularios){
+function iniciarSesión(){
+    limpiar();
+    tituloInfo.innerHTML = "Inicia sesión"
 
     let inputEmailLabel = document.createElement("label");
     inputEmailLabel.classList.add("form-label", "m-2");
     inputEmailLabel.innerHTML = "Ingresa tu mail";
-    contenedorFormularios.appendChild(inputEmailLabel);
+    contenedorUsuario.appendChild(inputEmailLabel);
+
     let inputEmail = document.createElement("input")
     inputEmail.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputEmail);
+    contenedorUsuario.appendChild(inputEmail);
 
     let inputContrasenaLabel =  document.createElement("label");
     inputContrasenaLabel.classList.add("form-label", "m-2");
     inputContrasenaLabel.innerHTML= "Ingresa la contraseña";
-    contenedorFormularios.appendChild(inputContrasenaLabel);
+    contenedorUsuario.appendChild(inputContrasenaLabel);
+
     let inputContrasena = document.createElement("input")
     inputContrasena.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputContrasena);
+    contenedorUsuario.appendChild(inputContrasena);
 
     let entrarBoton = document.createElement("button");
     entrarBoton.setAttribute("type", "button");
     entrarBoton.classList.add("btn", "btn-secondary", "m-2");
     entrarBoton.innerHTML = "Entrar";
-    contenedorFormularios.appendChild(entrarBoton);
+    contenedorUsuario.appendChild(entrarBoton);
 
     entrarBoton.addEventListener("click", function(){
-        let email = inputEmail.value;
-        let contrasena = inputContrasena.value;
-        let usuarioEncontrado = JSON.parse(localStorage.getItem(email));
+        let correo = inputEmail.value;
+        let password = inputContrasena.value;
+        let usuarioEncontrado = JSON.parse(localStorage.getItem(correo));
         
-        if (usuarioEncontrado && usuarioEncontrado.contrasena == contrasena) {
-            contenedorFormularios.innerHTML = "";
-            usuarioActual = new Usuario(email,contrasena);
-            usuarios.push(usuarioActual);
+        if (usuarioEncontrado && usuarioEncontrado.contrasena == password) {
+            usuarioActual = new Usuario(usuarioEncontrado.email, usuarioEncontrado.contrasena);
             alert("Inicio de sesión exitoso");
-            alert(usuarioActual.Categoria);
+            limpiar();
+            tituloInfo.innerHTML = "BIENVENIDO";
         
         } else {
             alert("Usuario no registrado / email o contraseña incorrectos");
@@ -122,209 +106,222 @@ function iniciarSesión(contenedorFormularios){
 
 }
 
-function crearUsuario(contenedorFormularios){
-    contenedorFormularios.innerHTML = "";
+function crearUsuario(){
+    limpiar();
+    tituloInfo.innerHTML = "Únete"
+
     let inputEmailLabel = document.createElement("label");
     inputEmailLabel.classList.add("form-label", "m-2");
     inputEmailLabel.innerHTML = "Ingresa tu mail para crear una cuenta nueva";
-    contenedorFormularios.appendChild(inputEmailLabel);
+    contenedorUsuario.appendChild(inputEmailLabel);
+
     let inputEmail = document.createElement("input")
     inputEmail.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputEmail);
+    contenedorUsuario.appendChild(inputEmail);
 
     let inputContrasenaLabel =  document.createElement("label");
     inputContrasenaLabel.classList.add("form-label", "m-2");
     inputContrasenaLabel.innerHTML= "Ingresa la contraseña de tu nueva cuenta";
-    contenedorFormularios.appendChild(inputContrasenaLabel);
+    contenedorUsuario.appendChild(inputContrasenaLabel);
 
     let inputContrasena = document.createElement("input")
     inputContrasena.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputContrasena);
+    contenedorUsuario.appendChild(inputContrasena);
 
     let crearCuentaBoton = document.createElement("button");
     crearCuentaBoton.setAttribute("type", "button");
     crearCuentaBoton.classList.add("btn", "btn-secondary", "m-2");
     crearCuentaBoton.innerHTML = "Crear cuenta";
-    contenedorFormularios.appendChild(crearCuentaBoton);
+    contenedorUsuario.appendChild(crearCuentaBoton);
 
     crearCuentaBoton.addEventListener("click", function(){
-        let email = inputEmail.value;
-        let contrasena = inputContrasena.value;
-        if (email && contrasena) {
-            let nuevoUsuario = new Usuario(email,contrasena);
-        localStorage.setItem(email, JSON.stringify(nuevoUsuario));
-        contenedorFormularios = "";
-        alert("Cuenta creada con éxito");
-        
+
+        let correo = inputEmail.value;
+        let password = inputContrasena.value;
+
+        if (correo && password) {
+            limpiar();
+            let nuevoUsuario = new Usuario(correo,password);
+            localStorage.setItem(correo, JSON.stringify(nuevoUsuario));
+            alert("Cuenta creada con éxito");
+            tituloInfo.innerHTML = "Ya podes iniciar sesión con tu cuenta nueva";
         } else {
             alert("Ingrese usuario o contraseña validos");
         }
-        
     })
-
 }
 
-function mostrarGastos(contenedorInfo, tituloInfo, contenedorFormularios){
-    limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
-    if (usuarioActual) {
-        
-        tituloInfo.innerHTML = "Estos son tus gastos";
+function mostrarGastos(){
+    limpiar();
+    if(usuarioActual){
+    tituloInfo.innerHTML = "Estos son tus Gastos";
 
-        let tablaGastos = document.createElement("table");
-        tablaGastos.classList.add("table");
-        contenedorFormularios.appendChild(tablaGastos);
-        
-        let theadGastos = document.createElement("thead");
-        tablaGastos.appendChild(theadGastos);
+    //muestro los gastos del usuario
+    let tableGastos = document.createElement("table");
+    tableGastos.classList.add("table");
+    let theadTableGastos = document.createElement("thead");
+    let tbodyTableGastos = document.createElement("tbody");
 
-        let trGastos = document.createElement("tr");
-        theadGastos.appendChild(trGastos);
+    let trTableGastos = document.createElement("tr");
 
-        let thGastosMonto = document.createElement("th");
-        thGastosMonto.setAttribute("scope", "col");
-        thGastosMonto.innerHTML = "Monto";
+    let thMonto = document.createElement("th");
+    thMonto.setAttribute("scope", "col");
+    thMonto.innerHTML = "MONTO";
 
-        let thGastosFecha = document.createElement("th");
-        thGastosFecha.setAttribute("scope", "col");
-        thGastosFecha.innerHTML = "Fecha";
+    let thFecha = document.createElement("th");
+    thFecha.setAttribute("scope", "col");
+    thFecha.innerHTML = "FECHA";
 
-        let thGastosCategoria = document.createElement("th");
-        thGastosCategoria.setAttribute("scope", "col");
-        thGastosCategoria.innerHTML = "Categoria";
+    let thDescripcion = document.createElement("th");
+    thDescripcion.setAttribute("scope", "col");
+    thDescripcion.innerHTML = "DESCRIPCIÓN";
 
-        let thGastosDescripcion = document.createElement("th");
-        thGastosDescripcion.setAttribute("scope", "col");
-        thGastosDescripcion.innerHTML = "Descripcion";
+    let thCategoria = document.createElement("th");
+    thCategoria.setAttribute("scope", "col");
+    thCategoria.innerHTML = "CATEGORIA";
 
-        trGastos.appendChild(thGastosMonto);
-        trGastos.appendChild(thGastosDescripcion);
-        trGastos.appendChild(thGastosCategoria);
-        trGastos.appendChild(thGastosFecha);
+    let arregloHeadTable = [];
+    arregloHeadTable.push(thMonto, thFecha, thDescripcion, thCategoria);
 
-        let thBody = document.createElement("tbody");
-        tablaGastos.appendChild(thBody);
+    arregloHeadTable.forEach(th => {
+        trTableGastos.appendChild(th);
+    });
 
-        usuarioActual.gastos.forEach(gasto => {
-        let trGasto = document.createElement("tr");
-        thBody.appendChild(trGasto);
+    let usuario = JSON.parse(localStorage.getItem(usuarioActual.email));
 
-        let thGastosMonto = document.createElement("th");
-        let tdGastosDescripcion =  Document.createElement("td");
-        let tdGastosCategoria =  Document.createElement("td");
-        let tdGastosFecha =  Document.createElement("td");
+    if(usuario.gastos.length == 0){
+            contenedorTablaGastos.innerHTML = "No hay gastos registrados";
+    }else{
+            
+            usuario.gastos.forEach(gasto => {
 
-        thGastosMonto.setAttribute("scope", "row");
-        thGastosMonto.innerHTML = `${gasto.monto}`;
+            let trGastoUsuario = document.createElement("tr");
 
+            let thGastoUsuarioMonto = document.createElement("th");
+            thGastoUsuarioMonto.setAttribute("scope", "row");
+            thGastoUsuarioMonto.innerHTML = `${gasto.monto}`;
 
+            let tdGastoUsuarioFecha = document.createElement("td");
+            tdGastoUsuarioFecha.innerHTML = `${mostrarFecha(new Date(gasto.fecha))}`;
+            
 
-        
+            let tdGastoUsuarioDescripcion = document.createElement("td");
+            tdGastoUsuarioDescripcion.innerHTML = `${gasto.descripcion}`;
+
+            let tdGastoUsuarioCategoria = document.createElement("td");
+            tdGastoUsuarioCategoria.innerHTML = `${gasto.categoria}`;
+
+            trGastoUsuario.appendChild(thGastoUsuarioMonto);
+            trGastoUsuario.appendChild(tdGastoUsuarioFecha);
+            trGastoUsuario.appendChild(tdGastoUsuarioDescripcion);
+            trGastoUsuario.appendChild(tdGastoUsuarioCategoria);
+            tbodyTableGastos.appendChild(trGastoUsuario);
+            theadTableGastos.appendChild(trTableGastos);
+            tableGastos.appendChild(theadTableGastos);
+            tableGastos.appendChild(tbodyTableGastos);
+            contenedorTablaGastos.appendChild(tableGastos);
         });
-        
-    } else {
-        let textoGastos = document.createElement("p");
-        textoGastos.innerHTML = "Debes iniciar sesion";
-        contenedorInfo.appendChild(textoGastos);
-
     }
-    
 
+    contenedorGastos.appendChild(contenedorTablaGastos);
 
-    //agregar nuevos gastos
+    //boton para agregar nuevos gastos
     let inputGastoMontoLabel =  document.createElement("label");
     inputGastoMontoLabel.classList.add("form-label", "m-2");
     inputGastoMontoLabel.innerHTML= "Ingrese el monto";
-    contenedorFormularios.appendChild(inputGastoMontoLabel);
+    contenedorAgregarGasto.appendChild(inputGastoMontoLabel);
 
     let inputGastoMonto = document.createElement("input")
     inputGastoMonto.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputGastoMonto);
+    contenedorAgregarGasto.appendChild(inputGastoMonto);
 
     let inputGastoCategoriaLabel =  document.createElement("label");
     inputGastoCategoriaLabel.classList.add("form-label", "m-2");
     inputGastoCategoriaLabel.innerHTML = "Ingrese la categoria";
-    contenedorFormularios.appendChild(inputGastoCategoriaLabel);
+    contenedorAgregarGasto.appendChild(inputGastoCategoriaLabel);
 
     let inputGastoCategoria = document.createElement("input")
     inputGastoMonto.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputGastoCategoria);
+    contenedorAgregarGasto.appendChild(inputGastoCategoria);
 
     let inputGastoDescripLabel =  document.createElement("label");
     inputGastoDescripLabel.classList.add("form-label", "m-2");
     inputGastoDescripLabel.innerHTML= "Ingrese la descripcion";
-    contenedorFormularios.appendChild(inputGastoDescripLabel);
+    contenedorAgregarGasto.appendChild(inputGastoDescripLabel);
 
     let inputGastoDescrip = document.createElement("input")
     inputGastoDescrip.classList.add("form-control", "m-2", "formulario");
-    contenedorFormularios.appendChild(inputGastoDescrip);
+    contenedorAgregarGasto.appendChild(inputGastoDescrip);
 
     let botonAgregarGasto = document.createElement("button");
     botonAgregarGasto.setAttribute("type", "button");
     botonAgregarGasto.classList.add("btn", "btn-secondary", "m-2");
     botonAgregarGasto.innerHTML = "Agregar gasto";
-    contenedorFormularios.appendChild(botonAgregarGasto);
+    contenedorAgregarGasto.appendChild(botonAgregarGasto);
+
+    contenedorGastos.appendChild(contenedorAgregarGasto);
 
     botonAgregarGasto.addEventListener("click", function(){
-        if(usuarioActual){
-            let gasto =  new Gasto(inputGastoMonto.value, inputGastoCategoria.value, inputGastoDescrip.value);
-            usuarioActual.agregarGasto(gasto);
-            localStorage.setItem(usuarioActual.email,JSON.stringify(usuarioActual));
-            alert("Gasto agregado!");
-            
-        }else{
-            alert("Debe iniciar sesion");
-        }
-        
+        let monto = inputGastoMonto.value;
+        let categoria = inputGastoCategoria.value;
+        let descripcion = inputGastoDescrip.value;
+        let gastoUsuario = new Gasto(monto, categoria, descripcion);
+        let usuarioInstancia = new Usuario(usuario.email, usuario.contrasena);
+
+        usuario.gastos.forEach(gastoObtenido => {
+            usuarioInstancia.agregarGasto(gastoObtenido);
+        });
+
+        usuarioInstancia.agregarGasto(gastoUsuario);
+        localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
+        alert("Gasto agregado correctamente, Toca el botón 'Registro de gastos' para actualizar");
     })
 
-    
+    }else{
+        tituloInfo.innerHTML = "Debes iniciar sesión";
+    } //cierra el if
 }
-function mostrarIngresos(contenedorInfo, tituloInfo, contenedorFormularios){
-    limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
+function mostrarIngresos(){
+    limpiar();
     tituloInfo.innerHTML = "Estos son tus Ingresos";
 }
-function mostrarDatosEstadisticos(contenedorInfo, tituloInfo, contenedorFormularios){
-    limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
+function mostrarDatosEstadisticos(){
+    limpiar();
     tituloInfo.innerHTML = "Datos estadísticos sobre tus registros";
 }
-function mostrarSobreNosotros(contenedorInfo, tituloInfo, contenedorFormularios){
-    limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
+function mostrarSobreNosotros(){
+    limpiar();
     tituloInfo.innerHTML = "¿Quienes somos?";
-    contenedorInfo.innerHTML = "¡Hola! Soy Virginia, estudiante de ingeniería en sistemas y la creadora apasionada detrás de MoneyMind, tu gestor de finanzas personales. ¿Por qué un gestor de finanzas? Porque como entusiasta de la tecnología y amante de la programación, comprendo la importancia de optimizar nuestras finanzas personales en un mundo cada vez más digitalizado. Mi plataforma está diseñada pensando en ti, para simplificar la gestión de tus ingresos, gastos, y metas financieras.  ¡Gracias por ser parte de esta comunidad!";
+    contenedorSN.innerHTML = "¡Hola! Soy Virginia, estudiante de ingeniería en sistemas y la creadora apasionada detrás de MoneyMind, tu gestor de finanzas personales. ¿Por qué un gestor de finanzas? Porque como entusiasta de la tecnología y amante de la programación, comprendo la importancia de optimizar nuestras finanzas personales en un mundo cada vez más digitalizado. Mi plataforma está diseñada pensando en ti, para simplificar la gestión de tus ingresos, gastos, y metas financieras.  ¡Gracias por ser parte de esta comunidad!";
 }
 
-function limpiar(contenedorInfo, tituloInfo, contenedorFormularios){
-    contenedorInfo.innerHTML = "";
+function limpiar(){
+    contenedorUsuario.innerHTML = "";
+    contenedorGastos.innerHTML = "";
+    contenedorIngresos.innerHTML = "";
+    contenedorDE.innerHTML = "";
+    contenedorSN.innerHTML = "";
     tituloInfo.innerHTML = "";
-    contenedorFormularios.innerHTML = "";
+    contenedorTablaGastos.innerHTML = "";
+    contenedorAgregarGasto.innerHTML = "";
 }
-
-
 
 //----------------------FLUJO------------------------------------------------------
-let contenedorInfo = document.getElementById("contenedorInfo");
-let tituloInfo = document.getElementById("tituloInfo");
-let contenedorFormularios = document.getElementById("contenedorFormularios");
-let formulariosAgregadosInicioSesion = false;
-let formulariosAgregadosUnirse = false;
 
 
+//---boton de inicio de sesion - crear cuenta--------
 document.getElementById("botonIniciarSesion").addEventListener("click", function(){
-    limpiar(contenedorInfo, tituloInfo, contenedorFormularios);
+    limpiar();
     tituloInfo.innerHTML = "Iniciar sesión o unirse";
 
-    //boton inicio de sesion
+    //boton de inicio de sesion
     let botonInicioSesion = document.createElement("button");
     botonInicioSesion.setAttribute("type", "button");
     botonInicioSesion.classList.add("btn", "btn-primary", "m-2");
     botonInicioSesion.innerHTML = "Iniciar sesión";
-    contenedorInfo.appendChild(botonInicioSesion);
+    contenedorUsuario.appendChild(botonInicioSesion);
     botonInicioSesion.addEventListener("click", function(){
-        if (!formulariosAgregadosInicioSesion) {
-            iniciarSesión(contenedorFormularios);
-            formulariosAgregadosInicioSesion = true;
-            
-        } 
+            iniciarSesión();
     });
 
     //boton unirse
@@ -332,36 +329,29 @@ document.getElementById("botonIniciarSesion").addEventListener("click", function
     botonUnirse.setAttribute("type", "button");
     botonUnirse.classList.add("btn", "btn-primary", "m-2");
     botonUnirse.innerHTML = "Quiero unirme";
-    contenedorInfo.appendChild(botonUnirse);
+    contenedorUsuario.appendChild(botonUnirse);
     botonUnirse.addEventListener("click", function(){
-        if (!formulariosAgregadosUnirse) {
-            crearUsuario(contenedorFormularios);
-            formulariosAgregadosUnirse = true;
-        } 
+            crearUsuario();
     });
 
 })
+
+//--------boton de registro de gastos--------
 document.getElementById("botonGastos").addEventListener("click", function(){
-    mostrarGastos(contenedorInfo, tituloInfo, contenedorFormularios);
-    formulariosAgregadosInicioSesion = false;
-    formulariosAgregadosUnirse = false;
-
+    mostrarGastos();
 });
 
+//---boton de registro de ingresos--------
 document.getElementById("botonIngresos").addEventListener("click", function(){
-    mostrarIngresos(contenedorInfo, tituloInfo, contenedorFormularios)
-    formulariosAgregadosInicioSesion = false;
-    formulariosAgregadosUnirse = false;
+    mostrarIngresos();
 });
 
+//---boton de datos estadisticos--------
 document.getElementById("botonDatosEstadisticos").addEventListener("click", function(){
-    mostrarDatosEstadisticos(contenedorInfo, tituloInfo, contenedorFormularios);
-    formulariosAgregadosInicioSesion = false;
-    formulariosAgregadosUnirse = false;
+    mostrarDatosEstadisticos();
 });
 
+//---boton sobre nosotros--------
 document.getElementById("botonSobreNosotros").addEventListener("click", function(){
-    mostrarSobreNosotros(contenedorInfo, tituloInfo, contenedorFormularios);
-    formulariosAgregadosInicioSesion = false;
-    formulariosAgregadosUnirse = false;
+    mostrarSobreNosotros();
 });
