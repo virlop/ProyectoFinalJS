@@ -264,7 +264,7 @@ function mostrarGastos(){
     contenedorGastos.appendChild(contenedorAgregarGasto);
 
     botonAgregarGasto.addEventListener("click", function(){
-        let monto = inputGastoMonto.value;
+        let monto = parseFloat(inputGastoMonto.value);
         let categoria = inputGastoCategoria.value;
         let descripcion = inputGastoDescrip.value;
         let gastoUsuario = new Gasto(monto, categoria, descripcion);
@@ -283,7 +283,7 @@ function mostrarGastos(){
     })
 
     }else{
-        tituloInfo.innerHTML = "Debes iniciar sesión";
+        tituloInfo.innerHTML = "Debes iniciar sesión para ver tus gastos";
     } //cierra el if
 }
 
@@ -397,7 +397,7 @@ function mostrarIngresos(){
         contenedorIngresos.appendChild(contenedorAgregarIngreso);
 
         botonAgregarIngreso.addEventListener("click", function(){
-            let monto = inputIngresoMonto.value;
+            let monto = parseFloat(inputIngresoMonto.value);
             let categoria = inputIngresoCategoria.value;
             let descripcion = inputIngresoDescrip.value;
             let ingresoUsuario = new Ingreso(monto, categoria, descripcion);
@@ -416,15 +416,58 @@ function mostrarIngresos(){
         })
 
     }else{
-        tituloInfo.innerHTML = "Debes iniciar sesión";
+        tituloInfo.innerHTML = "Debes iniciar sesión para ver tus ingresos";
         
     }
 }
 
 function mostrarDatosEstadisticos(){
     limpiar();
-    
-    tituloInfo.innerHTML = "Datos estadísticos sobre tus registros";
+    if (usuarioActual) {
+        tituloInfo.innerHTML = "Datos estadísticos sobre tus registros";
+
+        let usuario = JSON.parse(localStorage.getItem(usuarioActual.email));
+        
+        //suma de gastos
+        let sumaGastosLabel = document.createElement("label");
+        sumaGastosLabel.innerHTML = "Suma de todos tus gastos";
+        let sumaGastos = 0;
+        usuario.gastos.forEach(gasto => {
+            sumaGastos += gasto.monto;
+        });
+        let sumaGastosMostrar = document.createElement("p");
+        sumaGastosMostrar.innerHTML = sumaGastos;
+        contenedorDE.appendChild(sumaGastosLabel);
+        contenedorDE.appendChild(sumaGastosMostrar);
+
+        //suma de ingresos
+        let sumaIngresosLabel = document.createElement("label");
+        sumaIngresosLabel.innerHTML = "Suma de todos tus ingresos";
+        let sumaIngresos = 0;
+        usuario.ingresos.forEach(ingreso => {
+            sumaIngresos += ingreso.monto;
+        });
+        let sumaIngresosMostrar = document.createElement("p");
+        sumaIngresosMostrar.innerHTML = sumaIngresos;
+        contenedorDE.appendChild(sumaIngresosLabel);
+        contenedorDE.appendChild(sumaIngresosMostrar);
+
+        //balance total
+        let balanceTotalLabel = document.createElement("label");
+        balanceTotalLabel.innerHTML = "Balance total";
+        let balanceTotal = sumaIngresos + sumaGastos; //es suma porque los ingresos ya son negativos
+        let balanceTotalMostrar = document.createElement("p");
+        balanceTotalMostrar.innerHTML = balanceTotal;
+        contenedorDE.appendChild(balanceTotalLabel);
+        contenedorDE.appendChild(balanceTotalMostrar);
+
+        let avisoSituacion =  document.createElement("p");
+        (balanceTotal < 0) ? avisoSituacion.innerHTML = "Tus gastos son mayores a tus ingresos, cuidado!" : avisoSituacion.innerHTML = "Tus gastos son menores a los ingresos, bien!";
+        contenedorDE.appendChild(avisoSituacion);
+    } else {
+        tituloInfo.innerHTML = "Debes iniciar sesión para ver datos estadísticos";
+    }
+
 }
 
 function mostrarSobreNosotros(){
