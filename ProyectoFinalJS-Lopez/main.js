@@ -10,7 +10,8 @@ let contenedorDE = document.getElementById("contenedorDE");
 let contenedorSN =  document.getElementById("contenedorSN");
 let contenedorAgregarGasto = document.getElementById("contenedorAgregarGasto");
 let contenedorTablaGastos = document.getElementById("contenedorTablaGastos");
-
+let contenedorAgregarIngreso = document.getElementById("contenedorAgregarIngreso");
+let contenedorTablaIngresos = document.getElementById("contenedorTablaIngresos");
 //----------------------CLASES------------------------------------------------------
 
 
@@ -34,6 +35,7 @@ class Ingreso{
         }else{
             this.monto = monto;
         }
+        this.fecha = new Date();
         this.categoria = categoria;
         this.descripcion = descripcion;
     }
@@ -271,6 +273,9 @@ function mostrarGastos(){
         usuario.gastos.forEach(gastoObtenido => {
             usuarioInstancia.agregarGasto(gastoObtenido);
         });
+        usuario.ingresos.forEach(ingresoObtenido => {
+            usuarioInstancia.agregarIngreso(ingresoObtenido);
+        });
 
         usuarioInstancia.agregarGasto(gastoUsuario);
         localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
@@ -281,14 +286,147 @@ function mostrarGastos(){
         tituloInfo.innerHTML = "Debes iniciar sesión";
     } //cierra el if
 }
+
 function mostrarIngresos(){
     limpiar();
-    tituloInfo.innerHTML = "Estos son tus Ingresos";
+    if(usuarioActual){
+        tituloInfo.innerHTML = "Estos son tus Ingresos";
+
+        //muestro los ingresos del usuario
+        let tableIngresos = document.createElement("table");
+        tableIngresos.classList.add("table");
+        let theadTableIngresos = document.createElement("thead");
+        let tbodyTableIngresos = document.createElement("tbody");
+
+        let trTableIngresos = document.createElement("tr");
+
+        let thMonto = document.createElement("th");
+        thMonto.setAttribute("scope", "col");
+        thMonto.innerHTML = "MONTO";
+
+        let thFecha = document.createElement("th");
+        thFecha.setAttribute("scope", "col");
+        thFecha.innerHTML = "FECHA";
+
+        let thDescripcion = document.createElement("th");
+        thDescripcion.setAttribute("scope", "col");
+        thDescripcion.innerHTML = "DESCRIPCIÓN";
+
+        let thCategoria = document.createElement("th");
+        thCategoria.setAttribute("scope", "col");
+        thCategoria.innerHTML = "CATEGORIA";
+
+        let arregloHeadTable = [];
+        arregloHeadTable.push(thMonto, thFecha, thDescripcion, thCategoria);
+
+        arregloHeadTable.forEach(th => {
+            trTableIngresos.appendChild(th);
+        });
+
+        let usuario = JSON.parse(localStorage.getItem(usuarioActual.email));
+
+        if (usuario.ingresos.length == 0) {
+            contenedorTablaIngresos.innerHTML = "No hay ingresos registrados";
+        } else {
+            usuario.ingresos.forEach(ingreso => {
+
+                let trIngresoUsuario = document.createElement("tr");
+    
+                let thIngresoUsuarioMonto = document.createElement("th");
+                thIngresoUsuarioMonto.setAttribute("scope", "row");
+                thIngresoUsuarioMonto.innerHTML = `${ingreso.monto}`;
+    
+                let tdIngresoUsuarioFecha = document.createElement("td");
+                tdIngresoUsuarioFecha.innerHTML = `${mostrarFecha(new Date(ingreso.fecha))}`;
+                
+    
+                let tdIngresoUsuarioDescripcion = document.createElement("td");
+                tdIngresoUsuarioDescripcion.innerHTML = `${ingreso.descripcion}`;
+    
+                let tdIngresoUsuarioCategoria = document.createElement("td");
+                tdIngresoUsuarioCategoria.innerHTML = `${ingreso.categoria}`;
+    
+                trIngresoUsuario.appendChild(thIngresoUsuarioMonto);
+                trIngresoUsuario.appendChild(tdIngresoUsuarioFecha);
+                trIngresoUsuario.appendChild(tdIngresoUsuarioDescripcion);
+                trIngresoUsuario.appendChild(tdIngresoUsuarioCategoria);
+                tbodyTableIngresos.appendChild(trIngresoUsuario);
+                theadTableIngresos.appendChild(trTableIngresos);
+                tableIngresos.appendChild(theadTableIngresos);
+                tableIngresos.appendChild(tbodyTableIngresos);
+                contenedorTablaIngresos.appendChild(tableIngresos);
+            });
+        }
+
+        contenedorIngresos.appendChild(contenedorTablaIngresos);
+
+        //boton para agregar nuevos ingresos
+        let inputIngresoMontoLabel =  document.createElement("label");
+        inputIngresoMontoLabel.classList.add("form-label", "m-2");
+        inputIngresoMontoLabel.innerHTML= "Ingrese el monto";
+        contenedorAgregarIngreso.appendChild(inputIngresoMontoLabel);
+
+        let inputIngresoMonto = document.createElement("input")
+        inputIngresoMonto.classList.add("form-control", "m-2", "formulario");
+        contenedorAgregarIngreso.appendChild(inputIngresoMonto);
+
+        let inputIngresoCategoriaLabel =  document.createElement("label");
+        inputIngresoCategoriaLabel.classList.add("form-label", "m-2");
+        inputIngresoCategoriaLabel.innerHTML = "Ingrese la categoria";
+        contenedorAgregarIngreso.appendChild(inputIngresoCategoriaLabel);
+
+        let inputIngresoCategoria = document.createElement("input")
+        inputIngresoMonto.classList.add("form-control", "m-2", "formulario");
+        contenedorAgregarIngreso.appendChild(inputIngresoCategoria);
+
+        let inputIngresoDescripLabel =  document.createElement("label");
+        inputIngresoDescripLabel.classList.add("form-label", "m-2");
+        inputIngresoDescripLabel.innerHTML= "Ingrese la descripcion";
+        contenedorAgregarIngreso.appendChild(inputIngresoDescripLabel);
+
+        let inputIngresoDescrip = document.createElement("input")
+        inputIngresoDescrip.classList.add("form-control", "m-2", "formulario");
+        contenedorAgregarIngreso.appendChild(inputIngresoDescrip);
+
+        let botonAgregarIngreso = document.createElement("button");
+        botonAgregarIngreso.setAttribute("type", "button");
+        botonAgregarIngreso.classList.add("btn", "btn-secondary", "m-2");
+        botonAgregarIngreso.innerHTML = "Agregar ingreso";
+        contenedorAgregarIngreso.appendChild(botonAgregarIngreso);
+
+        contenedorIngresos.appendChild(contenedorAgregarIngreso);
+
+        botonAgregarIngreso.addEventListener("click", function(){
+            let monto = inputIngresoMonto.value;
+            let categoria = inputIngresoCategoria.value;
+            let descripcion = inputIngresoDescrip.value;
+            let ingresoUsuario = new Ingreso(monto, categoria, descripcion);
+            let usuarioInstancia = new Usuario(usuario.email, usuario.contrasena);
+    
+            usuario.ingresos.forEach(ingresoObtenido => {
+                usuarioInstancia.agregarIngreso(ingresoObtenido);
+            });
+            usuario.gastos.forEach(gastoObtenido => {
+                usuarioInstancia.agregarGasto(gastoObtenido);
+            });
+    
+            usuarioInstancia.agregarIngreso(ingresoUsuario);
+            localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
+            alert("Ingreso agregado correctamente, Toca el botón 'Registro de ingresos' para actualizar");
+        })
+
+    }else{
+        tituloInfo.innerHTML = "Debes iniciar sesión";
+        
+    }
 }
+
 function mostrarDatosEstadisticos(){
     limpiar();
+    
     tituloInfo.innerHTML = "Datos estadísticos sobre tus registros";
 }
+
 function mostrarSobreNosotros(){
     limpiar();
     tituloInfo.innerHTML = "¿Quienes somos?";
@@ -304,6 +442,9 @@ function limpiar(){
     tituloInfo.innerHTML = "";
     contenedorTablaGastos.innerHTML = "";
     contenedorAgregarGasto.innerHTML = "";
+    contenedorTablaIngresos.innerHTML = "";
+    contenedorAgregarIngreso.innerHTML = "";
+
 }
 
 //----------------------FLUJO------------------------------------------------------
