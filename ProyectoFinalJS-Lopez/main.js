@@ -1,4 +1,4 @@
-import {iniciarSesión, crearUsuario, mostrarGastos, mostrarIngresos, mostrarDatosEstadisticos, mostrarSobreNosotros, limpiar, usuarioActual } from "./funciones.js";
+import {iniciarSesión, crearUsuario, mostrarGastos, mostrarIngresos, mostrarDatosEstadisticos, mostrarSobreNosotros, limpiar, usuarioActual, vaciarUsuarioActual } from "./funciones.js";
 
 
 //----------------------VARIABLES------------------------------------------------------
@@ -73,7 +73,19 @@ document
             datosIngreso.innerHTML = `Iniciaste sesión con el mail: ${usuarioActual.email}`;
             datosIngreso.classList.add("text-center");
             contenedorUsuario.appendChild(datosIngreso);
-            
+            let botonCerrarSesion = document.createElement("button");
+            botonCerrarSesion.innerHTML = "Cerrar Sesión";
+            botonCerrarSesion.classList.add("btn", "btn-danger");
+            contenedorUsuario.appendChild(botonCerrarSesion);
+            botonCerrarSesion.addEventListener("click", function () {
+                vaciarUsuarioActual();
+                limpiar();
+                Swal.fire({
+                    title: "¡Adiós!",
+                    text: "Cerraste sesión correctamente",
+                    icon: "success"
+                    });
+            });
         }else{
         limpiar();
         tituloInfo.innerHTML = "Inicia sesión o únete a nuestra comunidad!";

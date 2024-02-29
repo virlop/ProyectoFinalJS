@@ -5,6 +5,9 @@ export let usuarioEncontrado;
 
 //----------------------FUNCIONES------------------------------------------------------
 
+export function vaciarUsuarioActual(){
+    usuarioActual = null;
+}
 export function mostrarFecha(fecha) {
     return (
         "Mes: " +
