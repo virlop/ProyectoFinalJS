@@ -27,7 +27,10 @@ export class Gasto {
         } else {
             this.monto = monto;
         }
-        this.fecha = new Date();
+        const DateTime = luxon.DateTime;
+        const now = DateTime.now();
+        this.fecha = now;
+        this.fechaString = now.toLocaleString();
         this.categoria = categoria;
         this.descripcion = descripcion;
     }
@@ -40,7 +43,10 @@ export class Ingreso {
         } else {
             this.monto = monto;
         }
-        this.fecha = new Date();
+        const DateTime = luxon.DateTime;
+        const now = DateTime.now();
+        this.fecha = now;
+        this.fechaString = now.toLocaleString();
         this.categoria = categoria;
         this.descripcion = descripcion;
     }

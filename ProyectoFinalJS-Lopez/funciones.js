@@ -1,5 +1,5 @@
 
-import { contenedorUsuario, tituloInfo, contenedorGastos, contenedorIngresos, contenedorDE, contenedorSN, contenedorAgregarGasto, contenedorTablaIngresos, contenedorAgregarIngreso, contenedorTablaGastos, Gasto, Ingreso, Usuario } from "./main.js";
+import {contenedorUsuario, tituloInfo, contenedorGastos, contenedorIngresos, contenedorDE, contenedorSN, contenedorAgregarGasto, contenedorTablaIngresos, contenedorAgregarIngreso, contenedorTablaGastos, Gasto, Ingreso, Usuario } from "./main.js";
 export let usuarioActual;
 export let usuarioEncontrado;
 
@@ -164,9 +164,7 @@ export function mostrarGastos() {
                 thGastoUsuarioMonto.innerHTML = `${gasto.monto}`;
 
                 let tdGastoUsuarioFecha = document.createElement("td");
-                tdGastoUsuarioFecha.innerHTML = `${mostrarFecha(
-                    new Date(gasto.fecha)
-                )}`;
+                tdGastoUsuarioFecha.innerHTML = `${gasto.fechaString}`;
 
                 let tdGastoUsuarioDescripcion = document.createElement("td");
                 tdGastoUsuarioDescripcion.innerHTML = `${gasto.descripcion}`;
@@ -303,9 +301,8 @@ export function mostrarIngresos() {
                 thIngresoUsuarioMonto.innerHTML = `${ingreso.monto}`;
 
                 let tdIngresoUsuarioFecha = document.createElement("td");
-                tdIngresoUsuarioFecha.innerHTML = `${mostrarFecha(
-                    new Date(ingreso.fecha)
-                )}`;
+                tdIngresoUsuarioFecha.innerHTML = `${ingreso.fechaString}`; 
+
 
                 let tdIngresoUsuarioDescripcion = document.createElement("td");
                 tdIngresoUsuarioDescripcion.innerHTML = `${ingreso.descripcion}`;
