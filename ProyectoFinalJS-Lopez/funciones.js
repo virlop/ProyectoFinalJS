@@ -66,48 +66,53 @@ export async function iniciarSesión() {
     
 }
 
-export function crearUsuario() {
+export async function crearUsuario() {
     limpiar();
-    tituloInfo.innerHTML = "Únete";
-
-    let inputEmailLabel = document.createElement("label");
-    inputEmailLabel.classList.add("form-label", "m-2");
-    inputEmailLabel.innerHTML = "Ingresa tu mail para crear una cuenta nueva";
-    contenedorUsuario.appendChild(inputEmailLabel);
-
-    let inputEmail = document.createElement("input");
-    inputEmail.classList.add("form-control", "m-2", "formulario");
-    contenedorUsuario.appendChild(inputEmail);
-
-    let inputContrasenaLabel = document.createElement("label");
-    inputContrasenaLabel.classList.add("form-label", "m-2");
-    inputContrasenaLabel.innerHTML = "Ingresa la contraseña de tu nueva cuenta";
-    contenedorUsuario.appendChild(inputContrasenaLabel);
-
-    let inputContrasena = document.createElement("input");
-    inputContrasena.classList.add("form-control", "m-2", "formulario");
-    contenedorUsuario.appendChild(inputContrasena);
-
-    let crearCuentaBoton = document.createElement("button");
-    crearCuentaBoton.setAttribute("type", "button");
-    crearCuentaBoton.classList.add("btn", "btn-secondary", "m-2");
-    crearCuentaBoton.innerHTML = "Crear cuenta";
-    contenedorUsuario.appendChild(crearCuentaBoton);
-
-    crearCuentaBoton.addEventListener("click", function () {
-        let correo = inputEmail.value;
-        let password = inputContrasena.value;
-
-        if (correo && password) {
-            limpiar();
-            let nuevoUsuario = new Usuario(correo, password);
-            localStorage.setItem(correo, JSON.stringify(nuevoUsuario));
-            alert("Cuenta creada con éxito");
-            tituloInfo.innerHTML = "Ya podes iniciar sesión con tu cuenta nueva";
-        } else {
-            alert("Ingrese usuario o contraseña validos");
+    let correo;
+    let contrasena;
+    const { value: email } = await Swal.fire({
+        title: "¡Nos alegra que quieras unirte!",
+        input: "email",
+        inputLabel: "Necesitamos tu correo para registrarte",
+        inputPlaceholder: "Email"
+        });
+        if (email) {
+            correo = email;
         }
-    });
+    const { value: password } = await Swal.fire({
+        title: "Enter your password",
+        input: "password",
+        inputLabel: "Password",
+        inputPlaceholder: "Enter your password",
+        inputAttributes: {
+            maxlength: "10",
+            autocapitalize: "off",
+            autocorrect: "off"
+            }
+        });
+        if (password) {
+            contrasena = password;
+            if (contrasena && correo){
+                if (localStorage.getItem(correo)) {
+                    //usuario registrado
+                    Swal.fire({
+                        icon: "error",
+                        title: "Usuario ya registrado",
+                        text: "Porfavor inicia sesión",
+                        });
+                } else {
+                    //usuario no registrado
+                    let nuevoUsuario = new Usuario(correo, contrasena);
+                    localStorage.setItem(correo, JSON.stringify(nuevoUsuario));
+                    Swal.fire({
+                        title: "¡Gracias por registrarte!",
+                        text: "Ya podés iniciar sesión",
+                        icon: "success"
+                        });
+                    limpiar();
+                }
+            }
+        }
 }
 
 export function mostrarGastos() {
@@ -235,9 +240,14 @@ export function mostrarGastos() {
 
             usuarioInstancia.agregarGasto(gastoUsuario);
             localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
-            alert(
-                "Gasto agregado correctamente, Toca el botón 'Registro de gastos' para actualizar"
-            );
+            mostrarGastos();
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Gasto agregado correctamente",
+                showConfirmButton: false,
+                timer: 1500
+                });
         });
     } else {
         Swal.fire("Debes iniciar sesión para ver tus gastos");
@@ -369,9 +379,14 @@ export function mostrarIngresos() {
 
             usuarioInstancia.agregarIngreso(ingresoUsuario);
             localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
-            alert(
-                "Ingreso agregado correctamente, Toca el botón 'Registro de ingresos' para actualizar"
-            );
+            mostrarIngresos();
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Ingreso agregado correctamente",
+                showConfirmButton: false,
+                timer: 1500
+                });
         });
     } else {
         Swal.fire("Debes iniciar sesión para ver tus Ingresos");
