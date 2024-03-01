@@ -1,0 +1,103 @@
+[
+  {
+    "email": "lolafunes@gmail.com",
+    "contrasena": "pass123",
+    "gastos": [
+      {
+        "monto": -500,
+        "fecha": "2024-02-28T18:30:00.000Z",
+        "fechaString": "28/02/2024",
+        "categoria": "Comida",
+        "descripcion": "Restaurante"
+      },
+      {
+        "monto": -200,
+        "fecha": "2024-02-29T12:00:00.000Z",
+        "fechaString": "29/02/2024",
+        "categoria": "Entretenimiento",
+        "descripcion": "Cine"
+      }
+    ],
+    "ingresos": [
+      {
+        "monto": 150000,
+        "fecha": "2024-02-27T09:00:00.000Z",
+        "fechaString": "27/02/2024",
+        "categoria": "Salario",
+        "descripcion": "Trabajo"
+      }
+    ]
+  },
+  {
+    "email": "javiermorales@gmail.com",
+    "contrasena": "perrito123",
+    "gastos": [
+      {
+        "monto": -300,
+        "fecha": "2024-02-25T15:00:00.000Z",
+        "fechaString": "25/02/2024",
+        "categoria": "Transporte",
+        "descripcion": "Uber"
+      }
+    ],
+    "ingresos": [
+      {
+        "monto": 2000000,
+        "fecha": "2024-02-24T12:00:00.000Z",
+        "fechaString": "24/02/2024",
+        "categoria": "Freelance",
+        "descripcion": "Diseño web"
+      }
+    ]
+  },
+  {
+    "email": "noecano@hotmail.com",
+    "contrasena": "hola78",
+    "gastos": [],
+    "ingresos": [
+      {
+        "monto": 500,
+        "fecha": "2024-02-26T09:00:00.000Z",
+        "fechaString": "26/02/2024",
+        "categoria": "Ventas",
+        "descripcion": "Venta de libros usados"
+      }
+    ]
+  },
+  {
+    "email": "sofif@gmail.com",
+    "contrasena": "abc123",
+    "gastos": [
+      {
+        "monto": -100,
+        "fecha": "2024-02-27T20:00:00.000Z",
+        "fechaString": "27/02/2024",
+        "categoria": "Comida",
+        "descripcion": "Delivery de pizza"
+      }
+    ],
+    "ingresos": []
+  },
+  {
+    "email": "jpriol@yahoo.com",
+    "contrasena": "123nosvemos",
+    "gastos": [
+      {
+        "monto": -50,
+        "fecha": "2024-02-29T18:00:00.000Z",
+        "fechaString": "29/02/2024",
+        "categoria": "Ropa",
+        "descripcion": "Camiseta"
+      }
+    ],
+    "ingresos": [
+      {
+        "monto": 3000,
+        "fecha": "2024-02-28T12:00:00.000Z",
+        "fechaString": "28/02/2024",
+        "categoria": "Venta de objetos",
+        "descripcion": "Venta de muebles viejos"
+      }
+    ]
+  }
+]
