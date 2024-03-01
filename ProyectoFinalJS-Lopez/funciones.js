@@ -9,7 +9,6 @@ export function vaciarUsuarioActual(){
     usuarioActual = null;
 }
 
-
 export async function iniciarSesión() {
     let correo;
     let contrasena;
@@ -36,24 +35,48 @@ export async function iniciarSesión() {
         });
         if (password) {
             contrasena = password;
-            usuarioEncontrado = JSON.parse(localStorage.getItem(correo));
-            if(usuarioEncontrado && usuarioEncontrado.contrasena == contrasena){
-                usuarioActual = new Usuario(usuarioEncontrado.email, usuarioEncontrado.contrasena);
-                limpiar();
-                tituloInfo.innerHTML = "Sesión iniciada";
-                Swal.fire({
-                    title: "¡Bienvenido!",
-                    text: "Iniciaste sesión correctamente",
-                    icon: "success"
+            try {
+                //busco usuario en la API
+                const usuarioEncontrado = await buscarUsuarioAPI(correo);
+                console.log(usuarioEncontrado);
+                
+                if(usuarioEncontrado && usuarioEncontrado.contrasena == contrasena) {
+                    //si el usuario está en la API lo guardo en localStorage
+                    usuarioActual = new Usuario(usuarioEncontrado.email, usuarioEncontrado.contrasena);
+                    
+                    usuarioEncontrado.gastos.forEach(gasto => {
+                        usuarioActual.agregarGasto(gasto);
                     });
-            }else{
+                    usuarioEncontrado.ingresos.forEach(ingreso => {
+                        usuarioActual.agregarIngreso(ingreso);
+                    })
+                    vaciarLocalStorage();
+                    localStorage.setItem(usuarioActual.email, JSON.stringify(usuarioActual)); // Asegúrate de agregar una clave para el localStorage
+                    limpiar();
+                    tituloInfo.innerHTML = "Sesión iniciada";
+                    Swal.fire({
+                        title: "¡Bienvenido!",
+                        text: "Iniciaste sesión correctamente",
+                        icon: "success"
+                    });
+                } else {
+                    //si el usuario NO está en la API muestro mje de error
+                    Swal.fire({
+                        icon: "error",
+                        title: "Datos incorrectos",
+                        text: "Mail y/o contraseña incorrectos",
+                    });
+                }
+            } catch (error) {
+                console.error("Error al buscar usuario:", error);
                 Swal.fire({
                     icon: "error",
-                    title: "Datos incorrectos",
-                    text: "Mail y/o contraseña incorrectos",
-                    });
+                    title: "Error al buscar usuario",
+                    text: "Hubo un problema al intentar iniciar sesión",
+                });
             }
         }
+        
     
 }
 
@@ -84,7 +107,7 @@ export async function crearUsuario() {
         if (password) {
             contrasena = password;
             if (contrasena && correo){
-                if (localStorage.getItem(correo)) {
+                if (await buscarUsuarioAPI(correo)) {
                     //usuario registrado
                     Swal.fire({
                         icon: "error",
@@ -93,8 +116,9 @@ export async function crearUsuario() {
                         });
                 } else {
                     //usuario no registrado
-                    let nuevoUsuario = new Usuario(correo, contrasena);
-                    localStorage.setItem(correo, JSON.stringify(nuevoUsuario));
+
+                    //aca iria un POST
+                    
                     Swal.fire({
                         title: "¡Gracias por registrarte!",
                         text: "Ya podés iniciar sesión",
@@ -178,31 +202,35 @@ export function mostrarGastos() {
         contenedorGastos.appendChild(contenedorTablaGastos);
 
         //boton para agregar nuevos gastos
+        let tituloGasto = document.createElement("h3");
+        tituloGasto.innerHTML = "Ingresá nuevos Gastos";
+        contenedorAgregarGasto.appendChild(tituloGasto);
+
         let inputGastoMontoLabel = document.createElement("label");
-        inputGastoMontoLabel.classList.add("form-label", "m-2");
+        inputGastoMontoLabel.classList.add("form-label", "m-2", "container-fluid");
         inputGastoMontoLabel.innerHTML = "Ingrese el monto";
         contenedorAgregarGasto.appendChild(inputGastoMontoLabel);
 
         let inputGastoMonto = document.createElement("input");
-        inputGastoMonto.classList.add("form-control", "m-2", "formulario");
+        inputGastoMonto.classList.add("form-control", "m-2", "formulario", "container-fluid");
         contenedorAgregarGasto.appendChild(inputGastoMonto);
 
         let inputGastoCategoriaLabel = document.createElement("label");
-        inputGastoCategoriaLabel.classList.add("form-label", "m-2");
+        inputGastoCategoriaLabel.classList.add("form-label", "m-2", "container-fluid");
         inputGastoCategoriaLabel.innerHTML = "Ingrese la categoria";
         contenedorAgregarGasto.appendChild(inputGastoCategoriaLabel);
 
         let inputGastoCategoria = document.createElement("input");
-        inputGastoMonto.classList.add("form-control", "m-2", "formulario");
+        inputGastoCategoria.classList.add("form-control", "m-2", "formulario", "container-fluid");
         contenedorAgregarGasto.appendChild(inputGastoCategoria);
 
         let inputGastoDescripLabel = document.createElement("label");
-        inputGastoDescripLabel.classList.add("form-label", "m-2");
+        inputGastoDescripLabel.classList.add("form-label", "m-2", "container-fluid");
         inputGastoDescripLabel.innerHTML = "Ingrese la descripcion";
         contenedorAgregarGasto.appendChild(inputGastoDescripLabel);
 
         let inputGastoDescrip = document.createElement("input");
-        inputGastoDescrip.classList.add("form-control", "m-2", "formulario");
+        inputGastoDescrip.classList.add("form-control", "m-2", "formulario", "container-fluid");
         contenedorAgregarGasto.appendChild(inputGastoDescrip);
 
         let botonAgregarGasto = document.createElement("button");
@@ -230,6 +258,9 @@ export function mostrarGastos() {
             usuarioInstancia.agregarGasto(gastoUsuario);
             localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
             mostrarGastos();
+
+            //faltaría agregar con metodo POST el gasto agregado al localStorage
+
             Swal.fire({
                 position: "top-end",
                 icon: "success",
@@ -240,7 +271,7 @@ export function mostrarGastos() {
         });
     } else {
         Swal.fire("Debes iniciar sesión para ver tus gastos");
-    } //cierra el if
+    } 
 }
 
 export function mostrarIngresos() {
@@ -316,31 +347,35 @@ export function mostrarIngresos() {
         contenedorIngresos.appendChild(contenedorTablaIngresos);
 
         //boton para agregar nuevos ingresos
+        let tituloIngreso = document.createElement("h3");
+        tituloIngreso.innerHTML = "Ingresá nuevos Ingresos";
+        contenedorAgregarIngreso.appendChild(tituloIngreso);
+
         let inputIngresoMontoLabel = document.createElement("label");
-        inputIngresoMontoLabel.classList.add("form-label", "m-2");
+        inputIngresoMontoLabel.classList.add("form-label", "m-2", "container-fluid");
         inputIngresoMontoLabel.innerHTML = "Ingrese el monto";
         contenedorAgregarIngreso.appendChild(inputIngresoMontoLabel);
 
         let inputIngresoMonto = document.createElement("input");
-        inputIngresoMonto.classList.add("form-control", "m-2", "formulario");
+        inputIngresoMonto.classList.add("form-control", "m-2", "formulario", "container-fluid");
         contenedorAgregarIngreso.appendChild(inputIngresoMonto);
 
         let inputIngresoCategoriaLabel = document.createElement("label");
-        inputIngresoCategoriaLabel.classList.add("form-label", "m-2");
+        inputIngresoCategoriaLabel.classList.add("form-label", "m-2", "container-fluid");
         inputIngresoCategoriaLabel.innerHTML = "Ingrese la categoria";
         contenedorAgregarIngreso.appendChild(inputIngresoCategoriaLabel);
 
         let inputIngresoCategoria = document.createElement("input");
-        inputIngresoMonto.classList.add("form-control", "m-2", "formulario");
+        inputIngresoCategoria.classList.add("form-control", "m-2", "formulario", "container-fluid");
         contenedorAgregarIngreso.appendChild(inputIngresoCategoria);
 
         let inputIngresoDescripLabel = document.createElement("label");
-        inputIngresoDescripLabel.classList.add("form-label", "m-2");
+        inputIngresoDescripLabel.classList.add("form-label", "m-2", "container-fluid");
         inputIngresoDescripLabel.innerHTML = "Ingrese la descripcion";
         contenedorAgregarIngreso.appendChild(inputIngresoDescripLabel);
 
         let inputIngresoDescrip = document.createElement("input");
-        inputIngresoDescrip.classList.add("form-control", "m-2", "formulario");
+        inputIngresoDescrip.classList.add("form-control", "m-2", "formulario", "container-fluid");
         contenedorAgregarIngreso.appendChild(inputIngresoDescrip);
 
         let botonAgregarIngreso = document.createElement("button");
@@ -368,6 +403,9 @@ export function mostrarIngresos() {
             usuarioInstancia.agregarIngreso(ingresoUsuario);
             localStorage.setItem(usuario.email, JSON.stringify(usuarioInstancia));
             mostrarIngresos();
+
+            //faltaría agregar con metodo POST el ingreso agregado al localStorage
+
             Swal.fire({
                 position: "top-end",
                 icon: "success",
@@ -453,4 +491,29 @@ export function limpiar() {
     contenedorAgregarGasto.innerHTML = "";
     contenedorTablaIngresos.innerHTML = "";
     contenedorAgregarIngreso.innerHTML = "";
+
+}
+
+//---------funcion que limpia el local storage--------------
+export function vaciarLocalStorage(){
+    localStorage.clear();
+}
+
+//---------funcion que busca un usuario en el data.json--------------
+export async function buscarUsuarioAPI(correo) {
+    try {
+        const response = await fetch("./data.json");
+        const data = await response.json();
+
+        let usuarioEncontradoAPI;
+        data.forEach(item => {
+            if (correo === item.email) {
+                usuarioEncontradoAPI = item;
+            }
+        });
+        return usuarioEncontradoAPI;
+    } catch (error) {
+        console.error("Error al buscar usuario en la API:", error);
+        return null;
+    }
 }

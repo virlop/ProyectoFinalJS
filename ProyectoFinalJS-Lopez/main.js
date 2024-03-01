@@ -1,5 +1,5 @@
 
-import {iniciarSesión, crearUsuario, mostrarGastos, mostrarIngresos, mostrarDatosEstadisticos, mostrarSobreNosotros, limpiar, usuarioActual, vaciarUsuarioActual } from "./funciones.js";
+import {iniciarSesión, crearUsuario, mostrarGastos, mostrarIngresos, mostrarDatosEstadisticos, mostrarSobreNosotros, limpiar, usuarioActual, vaciarUsuarioActual, vaciarLocalStorage } from "./funciones.js";
 
 //----------------------VARIABLES Y CONTENEDORES DOM------------------------------------------------------
 
@@ -18,6 +18,7 @@ export let contenedorAgregarIngreso = document.getElementById(
 export let contenedorTablaIngresos = document.getElementById(
     "contenedorTablaIngresos"
 );
+
 
 //----------------------CLASES------------------------------------------------------------------------
 
@@ -85,6 +86,7 @@ document
             botonCerrarSesion.classList.add("btn", "btn-danger");
             contenedorUsuario.appendChild(botonCerrarSesion);
             botonCerrarSesion.addEventListener("click", function () {
+                vaciarLocalStorage();
                 vaciarUsuarioActual();
                 limpiar();
                 Swal.fire({
@@ -144,3 +146,6 @@ document
     .addEventListener("click", function () {
         mostrarSobreNosotros();
     });
+
+//--------------------------------
+
