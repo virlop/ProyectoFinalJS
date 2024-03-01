@@ -3,21 +3,12 @@ import {contenedorUsuario, tituloInfo, contenedorGastos, contenedorIngresos, con
 export let usuarioActual;
 export let usuarioEncontrado;
 
-//----------------------FUNCIONES------------------------------------------------------
+//----------------------FUNCIONES-----------------------------------------------------------------------
 
 export function vaciarUsuarioActual(){
     usuarioActual = null;
 }
-export function mostrarFecha(fecha) {
-    return (
-        "Mes: " +
-        (fecha.getMonth() + 1) +
-        ", Día: " +
-        fecha.getDate() +
-        ", Año: " +
-        fecha.getFullYear()
-    );
-}
+
 
 export async function iniciarSesión() {
     let correo;
@@ -450,6 +441,7 @@ export function mostrarSobreNosotros() {
         "¡Hola! Soy Virginia, estudiante de ingeniería en sistemas y la creadora apasionada detrás de MoneyMind, tu gestor de finanzas personales. ¿Por qué un gestor de finanzas? Porque como entusiasta de la tecnología y amante de la programación, comprendo la importancia de optimizar nuestras finanzas personales en un mundo cada vez más digitalizado. Mi plataforma está diseñada pensando en ti, para simplificar la gestión de tus ingresos, gastos, y metas financieras.  ¡Gracias por ser parte de esta comunidad!";
 }
 
+//---------funcion que limpia el dom--------------
 export function limpiar() {
     contenedorUsuario.innerHTML = "";
     contenedorGastos.innerHTML = "";

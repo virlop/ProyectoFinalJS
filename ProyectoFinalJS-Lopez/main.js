@@ -1,7 +1,7 @@
+
 import {iniciarSesión, crearUsuario, mostrarGastos, mostrarIngresos, mostrarDatosEstadisticos, mostrarSobreNosotros, limpiar, usuarioActual, vaciarUsuarioActual } from "./funciones.js";
 
-
-//----------------------VARIABLES------------------------------------------------------
+//----------------------VARIABLES Y CONTENEDORES DOM------------------------------------------------------
 
 
 export let contenedorUsuario = document.getElementById("contenedorUsuario");
@@ -18,7 +18,8 @@ export let contenedorAgregarIngreso = document.getElementById(
 export let contenedorTablaIngresos = document.getElementById(
     "contenedorTablaIngresos"
 );
-//----------------------CLASES------------------------------------------------------
+
+//----------------------CLASES------------------------------------------------------------------------
 
 export class Gasto {
     constructor(monto, categoria, descripcion) {
@@ -30,7 +31,7 @@ export class Gasto {
         const DateTime = luxon.DateTime;
         const now = DateTime.now();
         this.fecha = now;
-        this.fechaString = now.toLocaleString();
+        this.fechaString = now.toLocaleString(); //guardo fecha Date y fecha String para mostrarla
         this.categoria = categoria;
         this.descripcion = descripcion;
     }
@@ -46,7 +47,7 @@ export class Ingreso {
         const DateTime = luxon.DateTime;
         const now = DateTime.now();
         this.fecha = now;
-        this.fechaString = now.toLocaleString();
+        this.fechaString = now.toLocaleString(); //guardo fecha Date y fecha String para mostrarla
         this.categoria = categoria;
         this.descripcion = descripcion;
     }
